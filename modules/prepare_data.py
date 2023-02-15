@@ -34,3 +34,8 @@ def remove_multiple_spaces(text):
   text, count_removed_spaces = re.subn(regexMultipleSpaces," ",text)
   return text, count_removed_spaces
   
+def convert_to_lowercase(text):
+  """string -> string
+  Function that converts a string to lowercase
+  """
+  return text.lower()
