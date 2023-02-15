@@ -39,3 +39,24 @@ def convert_to_lowercase(text):
   Function that converts a string to lowercase
   """
   return text.lower()
+
+def prepare_data(text):
+  """string -> string
+  Function that prepares a string for further processing
+  """
+  text, _, _ = remove_timecodes_and_number(text)
+  text, _ = remove_newline(text)
+  text, _ = remove_punctuation(text)
+  text, _ = remove_multiple_spaces(text)
+  text = convert_to_lowercase(text)
+  return text
+
+def prepare_data_in_dataframe(df):
+  """Dataframe -> Dataframe
+  Function that creates an new colmun on the dataframe with the transcripts pre-prepared for tokenization
+  Note : ATTENTION ! Dataframe should contains a column "transcripts"
+  """
+  newDf = df.copy()
+  newDf["transcripts_prepared_for_tokenization"] = newDf["transcript"].apply(prepare_data)
+
+  return newDf
