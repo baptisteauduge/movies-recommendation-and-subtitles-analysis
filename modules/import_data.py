@@ -27,7 +27,7 @@ def import_transcripts(nbSeries):
   """
   load_dotenv()
   folderTranscripts = os.getenv("PATH_FOLDER_TRANSCRIPTS")
-  regexSeriesFolderName = re.compile(r"^[0-9]*__.*")
+  regexSeriesFolderName = re.compile(r"^[0-9]*___.*")
   regexSeasonsFolderName = re.compile(r"^[0-9]+")
   regexEpisodesFolderName = re.compile(r"^[0-9]*__.*")
 
@@ -64,7 +64,7 @@ def import_transcripts(nbSeries):
         dataEpisode["name_episode"] = folderEpisode.split("__")[1].split(".")[0]
         dataEpisode["transcript"] = ""
         dataEpisode["path"] = folderTranscripts + "/" + folderSerie + "/" + folderSeason + "/" + folderEpisode
-        with open(folderTranscripts + "/" + folderSerie + "/" + folderSeason + "/" + folderEpisode, "r") as f:
+        with open(folderTranscripts + "/" + folderSerie + "/" + folderSeason + "/" + folderEpisode, "r", encoding="latin1") as f:
           dataEpisode["transcript"] = f.read()
         data.append(dataEpisode)
   return pd.DataFrame(data)
