@@ -17,3 +17,11 @@ def remove_newline_from_text(text):
   regexNewline = re.compile(r"\n")
   text, count_removed_newline = re.subn(regexNewline,"",text)
   return text, count_removed_newline
+
+def remove_punctuation_from_text(text):
+  """string -> Tuple(string, int)
+  Function that removes punctuation from a string and returns a new string plus the number of removed punctuation
+  """
+  regexPunctuation = re.compile(r"[!\"#\＄%&\'\(\)\*\+,-\./:;<=>\?@\[\\\]\^_`{\|}~]")
+  text, count_removed_punctuation = re.subn(regexPunctuation," ",text)
+  return text, count_removed_punctuation
