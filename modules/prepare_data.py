@@ -25,3 +25,12 @@ def remove_punctuation_from_text(text):
   regexPunctuation = re.compile(r"[!\"#\＄%&\'\(\)\*\+,-\./:;<=>\?@\[\\\]\^_`{\|}~]")
   text, count_removed_punctuation = re.subn(regexPunctuation," ",text)
   return text, count_removed_punctuation
+
+def remove_multiple_spaces_from_text(text):
+  """string -> Tuple(string, int)
+  Function that removes multiple spaces from a string and returns a new string plus the number of removed spaces
+  """
+  regexMultipleSpaces = re.compile(r"\s\s+")
+  text, count_removed_spaces = re.subn(regexMultipleSpaces," ",text)
+  return text, count_removed_spaces
+  
