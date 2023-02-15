@@ -18,4 +18,19 @@ def remove_newline(text):
   text, count_removed_newline = re.subn(regexNewline,"",text)
   return text, count_removed_newline
 
+def remove_punctuation(text):
+  """string -> Tuple(string, int)
+  Function that removes punctuation from a string and returns a new string plus the number of removed punctuation
+  """
+  regexPunctuation = re.compile(r"[!\"#\＄%&\'\(\)\*\+,-\./:;<=>\?@\[\\\]\^_`{\|}~]")
+  text, count_removed_punctuation = re.subn(regexPunctuation," ",text)
+  return text, count_removed_punctuation
+
+def remove_multiple_spaces(text):
+  """string -> Tuple(string, int)
+  Function that removes multiple spaces from a string and returns a new string plus the number of removed spaces
+  """
+  regexMultipleSpaces = re.compile(r"\s\s+")
+  text, count_removed_spaces = re.subn(regexMultipleSpaces," ",text)
+  return text, count_removed_spaces
   
