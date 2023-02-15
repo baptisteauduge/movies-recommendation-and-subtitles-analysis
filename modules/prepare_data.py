@@ -9,3 +9,11 @@ def remove_timecodes_and_number(text):
   text, count_removed_timecode = re.subn(regexTimecode, "", text)
   text, count_removed_number = re.subn(regexNumber, "", text)
   return text, count_removed_timecode, count_removed_number
+
+def remove_newline_from_text(text):
+  """string ->Tuple(string, int)
+  Function that removes the newline from a string and returns a new string plus the number of removed newline
+  """
+  regexNewline = re.compile(r"\n")
+  text, count_removed_newline = re.subn(regexNewline,"",text)
+  return text, count_removed_newline
