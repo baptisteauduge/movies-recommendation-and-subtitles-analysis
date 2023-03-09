@@ -40,6 +40,14 @@ def convert_to_lowercase(text):
   """
   return text.lower()
 
+def keep_only_letters(text):
+  """string -> string
+  Function that keeps only letters and spaces on a string
+  """
+  regexLetters = re.compile(r"[a-z ]")
+  return "".join(re.findall(regexLetters, text))
+
+
 def prepare_data(text):
   """string -> string
   Function that prepares a string for further processing
@@ -49,6 +57,7 @@ def prepare_data(text):
   text, _ = remove_punctuation(text)
   text, _ = remove_multiple_spaces(text)
   text = convert_to_lowercase(text)
+  text = keep_only_letters(text)
   return text
 
 def prepare_data_in_dataframe(df):
