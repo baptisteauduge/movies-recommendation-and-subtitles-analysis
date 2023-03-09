@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import re
 from dotenv import load_dotenv
+import logging
 
 def __get_number_serie_with_folder_name(folderName):
   return int(folderName.split("___")[0])
@@ -40,22 +41,22 @@ def import_transcripts(nbSeries):
   for i in range(min(nbSeries, len(foldersSeries))):
     folderSerie = foldersSeries[i]
     serieName = folderSerie.split("___")[1]
-    print ("[Import] Processing folder", folderSerie, "as serie", serieName ,"...")
-    print("[Import] Fetching seasons ...")
+    logging.info("[Import] Processing folder", folderSerie, "as serie", serieName ,"...")
+    logging.info("[Import] Fetching seasons ...")
     allSubfolders = os.listdir(folderTranscripts + "/" + folderSerie)
     allFoldersSeasons = [f for f in allSubfolders if regexSeasonsFolderName.match(f)]
     allFoldersSeasons = sorted(allFoldersSeasons, key=__get_number_season_with_folder_name)
 
     for j in range(len(allFoldersSeasons)):
-      print("[Import] Processing season", allFoldersSeasons[j], "...")
+      logging.info("[Import] Processing season", allFoldersSeasons[j], "...")
       folderSeason = allFoldersSeasons[j]
-      print("[Import] Fetching episodes ...")
+      logging.info("[Import] Fetching episodes ...")
       allSubfolders = os.listdir(folderTranscripts + "/" + folderSerie + "/" + folderSeason)
       allFoldersEpisodes = [f for f in allSubfolders if regexEpisodesFolderName.match(f)]
       allFoldersEpisodes = sorted(allFoldersEpisodes, key=__get_number_episode_with_file_name)
       for k in range(len(allFoldersEpisodes)):
 
-        print("[Import] Processing episode", allFoldersEpisodes[k], "...")
+        logging.info("[Import] Processing episode", allFoldersEpisodes[k], "...")
         folderEpisode = allFoldersEpisodes[k]
         dataEpisode = dict()
         dataEpisode["serie"] = serieName
