@@ -15,40 +15,6 @@ def tokenization(df):
   df["transcript_tokenized"] = df["transcripts_prepared_for_tokenization"].apply(word_tokenize)
 
   return df
-      
-def remove_not_english(df):
-  """Dataframe -> DataFrame
-  Function that removes the series without english 
-  Attention: the transcript must be tokenized
-  """
-  toDelete = set()
-
-  for i in range(len(df)):
-    text = df.iloc[i]['transcript_tokenized']
-
-    languages_shared_words = {}
-    # tokenization en mots
-    for language in stopwords.fileids():
-        # stopwords pour chaque langue
-        stopwords_liste = stopwords.words(language)
-        # on retire les doublons
-        text = set(text)
-        # les mots communs entre stopwords 
-        # d'une langue et les mots de message
-        common_elements = text.intersection(stopwords_liste)
-        # ajout du couple au dictionnaire
-        languages_shared_words[language] = len(common_elements)
-    # on retourne la langue avec le max de mots commun
-    if (max(languages_shared_words, key = languages_shared_words.get) != 'english'):
-      toDelete.add(df.iloc[i]['path'])
-  
-  for ep in toDelete:
-     df.drop(ep, axis = 0)
-  
-  return df
-
-def tag_word(array_text):
-   nltk.pos_tag(array_text)
 
 def __lemmatize_word(token):
     lemma = WordNetLemmatizer().lemmatize(token, pos='v')
@@ -99,6 +65,7 @@ def get_occurence_from_df_ep(df):
    """
 
    df["occurence_ep"] = df["transcript_lemanized"].apply(get_occurence_from_list_lem)
+   return df
 
 def get_occurence_from_df_serie(df):
    """Dataframe -> Dataframe
@@ -122,24 +89,3 @@ def get_occurence_from_df_serie(df):
    res[last_serie] = get_occurence_from_list_lem(list_lem_serie)
    return pd.DataFrame(res)
          
-def get_occurence_from_df_episodes(dfTranscriptsLemanized):
-   """Dataframe -> Dataframe
-   Function that returns a new dataframe with the dictionary of occurence of the words
-   """
-
-   last_serie = dfTranscriptsLemanized.iloc[0]["serie"]
-   list_lem_serie = []
-   res = dict()
-
-   for i in range(len(dfTranscriptsLemanized)):
-
-    if dfTranscriptsLemanized.iloc[i]['serie'] == last_serie:
-      list_lem_serie += dfTranscriptsLemanized.iloc[i]["transcript_lemanized"]
-   
-    else:
-      res[last_serie] = get_occurence_from_list_lem(list_lem_serie)
-      last_serie = dfTranscriptsLemanized.iloc[i]['serie']
-      list_lem_serie = dfTranscriptsLemanized.iloc[i]['transcript_lemanized']
-   
-   res[last_serie] = get_occurence_from_list_lem(list_lem_serie)
-   return pd.DataFrame(res)
