@@ -122,3 +122,24 @@ def get_occurence_from_df_serie(df):
    res[last_serie] = get_occurence_from_list_lem(list_lem_serie)
    return pd.DataFrame(res)
          
+def get_occurence_from_df_episodes(dfTranscriptsLemanized):
+   """Dataframe -> Dataframe
+   Function that returns a new dataframe with the dictionary of occurence of the words
+   """
+
+   last_serie = dfTranscriptsLemanized.iloc[0]["serie"]
+   list_lem_serie = []
+   res = dict()
+
+   for i in range(len(dfTranscriptsLemanized)):
+
+    if dfTranscriptsLemanized.iloc[i]['serie'] == last_serie:
+      list_lem_serie += dfTranscriptsLemanized.iloc[i]["transcript_lemanized"]
+   
+    else:
+      res[last_serie] = get_occurence_from_list_lem(list_lem_serie)
+      last_serie = dfTranscriptsLemanized.iloc[i]['serie']
+      list_lem_serie = dfTranscriptsLemanized.iloc[i]['transcript_lemanized']
+   
+   res[last_serie] = get_occurence_from_list_lem(list_lem_serie)
+   return pd.DataFrame(res)
