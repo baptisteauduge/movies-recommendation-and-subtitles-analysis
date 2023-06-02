@@ -1,7 +1,6 @@
 import os
 import pandas as pd
 import re
-from dotenv import load_dotenv
 import logging
 
 def __get_number_serie_with_folder_name(folderName):
@@ -26,8 +25,7 @@ def import_transcripts(nbSeries):
       - 1    (Season 1)
         - 1__Episode1.txt
   """
-  load_dotenv()
-  folderTranscripts = os.getenv("PATH_FOLDER_TRANSCRIPTS")
+  folderTranscripts = "data/transcripts"
   regexSeriesFolderName = re.compile(r"^[0-9]*___.*")
   regexSeasonsFolderName = re.compile(r"^[0-9]+")
   regexEpisodesFolderName = re.compile(r"^[0-9]*__.*")

@@ -1,28 +1,37 @@
 import re
+from tqdm.auto import tqdm
+tqdm.pandas()
+
 def remove_timecodes_and_number(text):
   """string -> Tuple(string, int, int)
   Function that removes timecodes and numbers from a string and returns the new string, the number of removed timecodes and the number of removed numbers
   """
-  regexNumber = re.compile(r"^[0-9]*$")
+  regexNumber = re.compile(r"[0-9]*")
   # 00:12:26,680 --> 00:12:28,680
   regexTimecode = re.compile(r"^[0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3} --> [0-9]{2}:[0-9]{2}:[0-9]{2},[0-9]{3}$", re.MULTILINE)
   text, count_removed_timecode = re.subn(regexTimecode, "", text)
   text, count_removed_number = re.subn(regexNumber, "", text)
   return text, count_removed_timecode, count_removed_number
 
-def remove_newline(text):
+def remove_newline_tab_return(text):
   """string ->Tuple(string, int)
-  Function that removes the newline from a string and returns a new string plus the number of removed newline
+  Function that removes the newline from a string and returns a new string plus the number of removed newline, tab and return
   """
   regexNewline = re.compile(r"\n")
+  regexTab = re.compile(r"\t")
+  regexReturn = re.compile(r"\r")
+
   text, count_removed_newline = re.subn(regexNewline," ",text)
-  return text, count_removed_newline
+  text, count_removed_tab = re.subn(regexTab," ",text)
+  text, count_removed_return = re.subn(regexReturn," ",text)
+
+  return text, count_removed_newline + count_removed_tab + count_removed_return
 
 def remove_punctuation(text):
   """string -> Tuple(string, int)
   Function that removes punctuation from a string and returns a new string plus the number of removed punctuation
   """
-  regexPunctuation = re.compile(r"[!\"#\＄%&\'\(\)\*\+,-\./:;<=>\?@\[\\\]\^_`{\|}~]")
+  regexPunctuation = re.compile(r"[!\"#\＄%&\(\)\*\+,-\./:;<=>\?@\[\\\]\^_{\|}~]")
   text, count_removed_punctuation = re.subn(regexPunctuation," ",text)
   return text, count_removed_punctuation
 
@@ -34,40 +43,32 @@ def remove_multiple_spaces(text):
   text, count_removed_spaces = re.subn(regexMultipleSpaces," ",text)
   return text, count_removed_spaces
   
-def convert_to_lowercase(text):
+def remove_non_ascii(text):
   """string -> string
-  Function that converts a string to lowercase
+  Function that removes non-ascii characters from a string and returns a new string
   """
-  return text.lower()
-
-def keep_only_letters(text):
-  """string -> string
-  Function that keeps only letters and spaces on a string
-  """
-  regexLetters = re.compile(r"[a-z ]")
-  return "".join(re.findall(regexLetters, text))
-
+  regexNonAscii = re.compile(r"[^\x00-\x7F]+")
+  text = re.sub(regexNonAscii," ",text)
+  return text
 
 def prepare_data(text):
   """string -> string
   Function that prepares a string for further processing
   """
   text, _, _ = remove_timecodes_and_number(text)
-  text, _ = remove_newline(text)
+  text = remove_non_ascii(text)
+  text, _ = remove_newline_tab_return(text)
   text, _ = remove_punctuation(text)
   text, _ = remove_multiple_spaces(text)
-  text = convert_to_lowercase(text)
-  text = keep_only_letters(text)
   return text
 
 def prepare_data_in_dataframe(df):
   """Dataframe -> Dataframe
   Function that creates an new colmun on the dataframe with the transcripts pre-prepared for tokenization
-  Note : ATTENTION ! Dataframe should contains a column "transcripts"
+  Note : ATTENTION ! Dataframe should contains a column "transcripts", she will be removed
   """
-  newDf = df.copy()
-  newDf["transcripts_prepared_for_tokenization"] = newDf["transcript"].apply(prepare_data)
-
-  return newDf
+  df["transcripts_prepared_for_tokenization"] = df["transcript"].progress_apply(prepare_data)
+  df.drop(columns=["transcript"], inplace=True)
+  return df
 
 
