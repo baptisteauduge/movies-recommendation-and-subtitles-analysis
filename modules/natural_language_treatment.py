@@ -28,13 +28,14 @@ def save_array_to_path(array, path):
   with open(path, 'wb') as file:
     pickle.dump(array, file)
 
-def lematize_transcript_and_save(path):
+def lemmatize_transcript_and_save(path):
   lematized = get_lemmatized_transcript_from_path(path)
-  save_array_to_path(lematized, 'data/lemmatized/' + path.replace('data/transcripts/', ''))
+  lower_case_lematized = [word.lower() for word in lematized]
   del lematized
+  save_array_to_path(lower_case_lematized, 'data/lemmatized/' + path.replace('data/transcripts/', ''))
 
-def lematize_df_path_episodes_and_save(df):
-  df['path'].swifter.apply(lematize_transcript_and_save)
+def lemmatize_df_path_episodes_and_save(df):
+  df['path'].swifter.apply(lemmatize_transcript_and_save)
 
 # ########################################################
 
