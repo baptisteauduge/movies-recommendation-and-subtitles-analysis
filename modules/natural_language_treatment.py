@@ -13,7 +13,7 @@ nlp = spacy.load("en_core_web_sm", disable=['parser', 'ner', 'textcat', 'tokeniz
 
 def lemmatize_batch(batch):
    res = []
-   for doc in nlp.pipe(batch, batch_size=100, n_process=-1):
+   for doc in nlp.pipe(batch, batch_size=50, n_process=-1):
       res.append([word.lemma_.lower() for word in doc if word.lemma_ != ' ' and word.lemma_[0] != "'" and word.lemma_[0] != '-'])
    return res
 
@@ -22,7 +22,7 @@ def load_transcript_from_path(path):
       transcript = file.read().replace('\ufffd', ' ')
    return transcript
 
-def tokenize_and_lemmatize_df_path_episodes_and_save(df, batch_size=500):
+def tokenize_and_lemmatize_df_path_episodes_and_save(df, batch_size=200):
 
    size = len(df)
    for i in tqdm(range(0, len(df), batch_size)):
