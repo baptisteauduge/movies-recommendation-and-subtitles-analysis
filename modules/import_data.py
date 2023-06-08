@@ -50,5 +50,5 @@ def get_df_paths_episodes():
         dataEpisode["episode_name"] = folderEpisode.split("__")[1].split(".")[0]
         dataEpisode["path"] = folderTranscripts + "/" + folderSerie + "/" + folderSeason + "/" + folderEpisode
         data.append(dataEpisode)
-        
+
   return pd.DataFrame(data)

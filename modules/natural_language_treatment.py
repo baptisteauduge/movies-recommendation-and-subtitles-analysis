@@ -30,7 +30,7 @@ def save_array_to_path(array, path):
 
 def lematize_transcript_and_save(path):
   lematized = get_lemmatized_transcript_from_path(path)
-  save_array_to_path(lematized, 'data/lemmatized/' + path)
+  save_array_to_path(lematized, 'data/lemmatized/' + path.replace('data/transcripts/', ''))
   del lematized
 
 def lematize_df_path_episodes_and_save(df):
