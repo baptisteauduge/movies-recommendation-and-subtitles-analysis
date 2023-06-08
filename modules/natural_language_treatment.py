@@ -1,18 +1,15 @@
 import swifter
 import spacy
 import pickle
-from tqdm.auto import tqdm
 import os
 import modules.prepare_data as prepare_data
-
-tqdm.pandas()
 
 # ########################################################
 #                    LEMMATIZATION
 # ########################################################
 
 def lemmatize_sentence(sentence):
-  nlp = spacy.load("en_core_web_sm")
+  nlp = spacy.load("en_core_web_sm", disable=['parser', 'ner', 'tagger'])
   return [word.lemma_ for word in nlp(sentence)]
 
 def load_transcript_from_path(path):
