@@ -1,62 +1,43 @@
-import nltk
-import pandas as pd
-from nltk.corpus import stopwords, wordnet
-from nltk.tokenize import word_tokenize
-from nltk.stem import WordNetLemmatizer
-from tqdm.auto import tqdm
+import swifter
 import spacy
-
+import pickle
+from tqdm.auto import tqdm
+import os
 tqdm.pandas()
-nlp = spacy.load("en_core_web_sm")
 
+# ########################################################
+#                    LEMMATIZATION
+# ########################################################
 
-# def tokenization(df):
-#   """Dataframe -> Dataframe
-#   Function that tokenize transcripts that are prepared for tokenization
-#   """
+def lemmatize_sentence(sentence):
+  nlp = spacy.load("en_core_web_sm")
+  return [word.lemma_ for word in nlp(sentence)]
 
-#   df["transcripts_prepared_for_tokenization"] = df["transcripts_prepared_for_tokenization"].astype(str)
-#   df["transcript_tokenized"] = df["transcripts_prepared_for_tokenization"].apply(word_tokenize)
+def load_transcript_from_path(path):
+  with open(path, 'r') as file:
+    transcript = file.read()
+  return transcript
 
-#   return df
+def get_lemmatized_transcript_from_path(path):
+  transcript = load_transcript_from_path(path)
+  return lemmatize_sentence(transcript)
 
-# def __lemmatize_word(token):
-#     lemma = WordNetLemmatizer().lemmatize(token, pos='v')
-#     print('Token is ' + token + ' lemma is ' + lemma)
-#     if lemma == token:
-#         lemma = WordNetLemmatizer().lemmatize(token, pos='n')
-#     print('Token is ' + token + ' lemma is ' + lemma)
-#     if lemma == token:
-#         lemma = WordNetLemmatizer().lemmatize(token, pos='a')
-#     print('Token is ' + token + ' lemma is ' + lemma)
-#     if lemma == token:
-#         lemma = WordNetLemmatizer().lemmatize(token, pos='r')
-#     print('Token is ' + token + ' lemma is ' + lemma)
-#     if lemma == token:
-#         lemma_synsets = wordnet.synsets(token)
-#         if len(lemma_synsets) > 0:
-#             lemma = lemma_synsets[0].lemmas()[0].name()
-#     print('Token is ' + token + ' lemma is ' + lemma)
-#     return lemma
+def save_array_to_path(array, path):
+  # Create directory if not exists
+  os.makedirs(os.path.dirname(path), exist_ok=True)
+  with open(path, 'wb') as file:
+    pickle.dump(array, file)
 
-def __lemmatize_text(text):
-  """text -> Arraytext
-  Function that lemmatize an array text
-  """
-  if type(text) != str:
-    return []
-  
-  doc = nlp(text)
-  return [token.lemma_ for token in doc if token.lemma_ != ' ' and token.lemma_ != '']
+def lematize_transcript_and_save(path):
+  lematized = get_lemmatized_transcript_from_path(path)
+  save_array_to_path(lematized, 'data/lemmatized/' + path)
+  del lematized
 
-def lemmatize_df(df):
-  """DataFrame -> Null
-  Function that lemanize the tokens from a dataframe 
-  """
-  df['transcript_lemmanized'] = df.transcripts_prepared_for_tokenization.progress_apply(__lemmatize_text)
-  res = df.drop('transcripts_prepared_for_tokenization', axis=1)
+def lematize_df_path_episodes_and_save(df):
+  df['path'].swifter.apply(lematize_transcript_and_save)
 
-  return res
+# ########################################################
+
 
 def lower_case_tab(tab):
    """Array_text -> Array_text
@@ -73,8 +54,7 @@ def lower_case_transcript_lemmanized(df):
    DataFrame -> DataFrame
    Function that lower case the transcript_lemmanized column
    """
-   for i in tqdm(range(len(df))):
-      df.iloc[i]['transcript_lemmanized'] = lower_case_tab(df.iloc[i]['transcript_lemmanized'])
+   df['transcript_lemmanized'] = df['transcript_lemmanized'].progress_apply(lower_case_tab)
    return df
 
 def get_occurence_from_list_lem(array_lem):
