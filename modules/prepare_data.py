@@ -57,8 +57,8 @@ def prepare_data(text):
   """
   text, _, _ = remove_timecodes_and_number(text)
   text = remove_non_ascii(text)
-  text, _ = remove_newline_tab_return(text)
   text, _ = remove_punctuation(text)
+  text, _ = remove_newline_tab_return(text)
   text, _ = remove_multiple_spaces(text)
   return text
 

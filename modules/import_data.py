@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import re
 import logging
+import pickle
 
 def __get_number_serie_with_folder_name(folderName):
   return int(folderName.split("___")[0])
@@ -23,7 +24,7 @@ def get_df_paths_episodes():
   foldersSeries = sorted(foldersSeries, key=__get_number_serie_with_folder_name)
   data = []
 
-  for i in range(len(foldersSeries)):
+  for i in range(min(len(foldersSeries), 3)):
     folderSerie = foldersSeries[i]
     serieName = folderSerie.split("___")[1]
     logging.info("[Import] Processing folder", folderSerie, "as serie", serieName ,"...")
@@ -52,3 +53,13 @@ def get_df_paths_episodes():
         data.append(dataEpisode)
 
   return pd.DataFrame(data)
+
+def save_array_to_path(array, path):
+  # Create directory if not exists
+  os.makedirs(os.path.dirname(path), exist_ok=True)
+  with open(path, 'wb') as file:
+    pickle.dump(array, file)
+
+def get_array_from_path(path):
+   with open(path, 'rb') as file:
+      return pickle.load(file)

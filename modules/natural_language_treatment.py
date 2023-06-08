@@ -1,41 +1,41 @@
 import swifter
 import spacy
-import pickle
-import os
 import modules.prepare_data as prepare_data
+import modules.import_data as import_data
+import pandas as pd
+from tqdm import tqdm
 
 # ########################################################
 #                    LEMMATIZATION
 # ########################################################
 
-def lemmatize_sentence(sentence):
-  nlp = spacy.load("en_core_web_sm", disable=['parser', 'ner', 'tagger'])
-  return [word.lemma_ for word in nlp(sentence)]
+nlp = spacy.load("en_core_web_sm", disable=['parser', 'ner', 'textcat', 'tokenizer', 'senter', 'sentencizer'])
+
+def lemmatize_batch(batch):
+   res = []
+   for doc in nlp.pipe(batch, batch_size=100, n_process=-1):
+      res.append([word.lemma_.lower() for word in doc if word.lemma_ != ' ' and word.lemma_[0] != "'" and word.lemma_[0] != '-'])
+   return res
 
 def load_transcript_from_path(path):
    with open(path, 'r', encoding='utf-8', errors='ignore') as file:
       transcript = file.read().replace('\ufffd', ' ')
    return transcript
 
-def get_lemmatized_transcript_from_path(path):
-  transcript = load_transcript_from_path(path)
-  transcript_tokenized =  prepare_data.prepare_data(transcript)
-  return lemmatize_sentence(transcript_tokenized)
+def tokenize_and_lemmatize_df_path_episodes_and_save(df, batch_size=500):
 
-def save_array_to_path(array, path):
-  # Create directory if not exists
-  os.makedirs(os.path.dirname(path), exist_ok=True)
-  with open(path, 'wb') as file:
-    pickle.dump(array, file)
-
-def tokenize_lemmatize_transcript_and_save(path):
-  lematized = get_lemmatized_transcript_from_path(path)
-  lower_case_lematized = [word.lower() for word in lematized]
-  del lematized
-  save_array_to_path(lower_case_lematized, 'data/lemmatized/' + path.replace('data/transcripts/', ''))
-
-def tokenize_and_lemmatize_df_path_episodes_and_save(df):
-  df['path'].swifter.apply(tokenize_lemmatize_transcript_and_save)
+   size = len(df)
+   for i in tqdm(range(0, len(df), batch_size)):
+      batch_transcripts = pd.Series([load_transcript_from_path(df['path'][j]) for j in range(i, min(i + batch_size, size))])
+      batch_tokenized_transcripts = batch_transcripts.swifter.progress_bar(False).apply(prepare_data.prepare_data)
+      del batch_transcripts
+      batch_lemmatized_transcripts = lemmatize_batch(batch_tokenized_transcripts)
+      del batch_tokenized_transcripts
+      # Saving the lemmatized transcripts in a file with the same name as the original transcript
+      print("Saving batch " + str(i) + " to " + str(min(i + batch_size, size)) + "...")
+      for j in range(i, min(i + batch_size, size)):
+         print("Saving " + df['path'][j].replace('data/transcripts/', 'data/lemmatized/'))
+         import_data.save_array_to_path(batch_lemmatized_transcripts[j - i],  df['path'][j].replace('data/transcripts/', 'data/lemmatized/'))
 
 # ########################################################
 
