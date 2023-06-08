@@ -24,7 +24,7 @@ def get_df_paths_episodes():
   foldersSeries = sorted(foldersSeries, key=__get_number_serie_with_folder_name)
   data = []
 
-  for i in range(min(len(foldersSeries), 3)):
+  for i in range(len(foldersSeries)):
     folderSerie = foldersSeries[i]
     serieName = folderSerie.split("___")[1]
     logging.info("[Import] Processing folder", folderSerie, "as serie", serieName ,"...")
