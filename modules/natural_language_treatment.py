@@ -16,9 +16,9 @@ def lemmatize_sentence(sentence):
   return [word.lemma_ for word in nlp(sentence)]
 
 def load_transcript_from_path(path):
-  with open(path, 'r') as file:
-    transcript = file.read()
-  return transcript
+   with open(path, 'r', encoding='utf-8', errors='replace') as file:
+      transcript = file.read().replace('\ufffd', ' ')
+   return transcript
 
 def get_lemmatized_transcript_from_path(path):
   transcript = load_transcript_from_path(path)
