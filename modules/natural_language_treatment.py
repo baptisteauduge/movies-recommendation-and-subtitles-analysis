@@ -3,6 +3,8 @@ import spacy
 import pickle
 from tqdm.auto import tqdm
 import os
+import modules.prepare_data as prepare_data
+
 tqdm.pandas()
 
 # ########################################################
@@ -20,7 +22,8 @@ def load_transcript_from_path(path):
 
 def get_lemmatized_transcript_from_path(path):
   transcript = load_transcript_from_path(path)
-  return lemmatize_sentence(transcript)
+  transcript_tokenized =  prepare_data.prepare_data(transcript)
+  return lemmatize_sentence(transcript_tokenized)
 
 def save_array_to_path(array, path):
   # Create directory if not exists
@@ -28,14 +31,14 @@ def save_array_to_path(array, path):
   with open(path, 'wb') as file:
     pickle.dump(array, file)
 
-def lemmatize_transcript_and_save(path):
+def tokenize_lemmatize_transcript_and_save(path):
   lematized = get_lemmatized_transcript_from_path(path)
   lower_case_lematized = [word.lower() for word in lematized]
   del lematized
   save_array_to_path(lower_case_lematized, 'data/lemmatized/' + path.replace('data/transcripts/', ''))
 
-def lemmatize_df_path_episodes_and_save(df):
-  df['path'].swifter.apply(lemmatize_transcript_and_save)
+def tokenize_and_lemmatize_df_path_episodes_and_save(df):
+  df['path'].swifter.apply(tokenize_lemmatize_transcript_and_save)
 
 # ########################################################
 
