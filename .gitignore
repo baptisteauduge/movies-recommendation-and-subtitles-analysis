@@ -1,0 +1,10 @@
+/data
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# Python
+*.pyc
+__pycache__
+
+# MacOs
+.DS_Store
