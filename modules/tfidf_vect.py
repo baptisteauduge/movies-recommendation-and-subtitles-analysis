@@ -77,7 +77,7 @@ class TfIdfVect():
       
     os.makedirs(os.path.dirname(self._path_cosine_distance_matrix), exist_ok=True)
     with open(self._path_cosine_distance_matrix, 'wb') as file:
-      pickle.dump(self._path_cosine_distance_matrix, file)
+      pickle.dump(self._cosine_distance_matrix, file)
     
 
   def _load_vectorizer_from_file(self):
