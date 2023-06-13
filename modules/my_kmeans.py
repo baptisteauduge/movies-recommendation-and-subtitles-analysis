@@ -32,3 +32,6 @@ class My_Kmeans:
     if self._df_kmeans is None:
       raise Exception("Le DataFrame de résultats est vide, veuillez d'abord appeler la méthode `get_result_df`")
     return max(self._df_kmeans.sum(numeric_only=True))
+
+  def get_inertia(self):
+    return self._kmeans.inertia_

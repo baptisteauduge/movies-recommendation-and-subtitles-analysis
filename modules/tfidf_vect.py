@@ -26,6 +26,9 @@ class TfIdfVect():
   def get_vectorizer(self):
     return self._vectorizer
 
+  def get_tf_idf_matrix(self):
+    return self._tf_idf_matrix
+
   def get_min_df(self):
     return self._min_df
 
