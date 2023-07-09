@@ -9,22 +9,28 @@ root_path_image = "exports/images/matrix_distance/"
 
 class TfIdfVect():
   
-  def __init__(self, min_df, max_df, nb_episodes, type):
-    self._vectorizer = TfidfVectorizer(strip_accents='unicode', stop_words='english', max_df=max_df, min_df=min_df)
+  def __init__(self, min_df, max_df, nb_episodes, type, input_vocabulary = False):
+    if not input_vocabulary:
+      self._vectorizer = TfidfVectorizer(strip_accents='unicode', stop_words='english', max_df=max_df, min_df=min_df)
+    else:
+      self._vectorizer = TfidfVectorizer(strip_accents='unicode', stop_words='english', max_df=max_df, min_df=min_df, vocabulary=input_vocabulary)
     self._type = type
     self._min_df = min_df
     self._max_df = max_df
     self.nb_episodes = nb_episodes
     self._path_vectorizer = f"data/pickle/tf-idf_vectorizer_min-df_{self._min_df}_max-df_{self._max_df}-{self.nb_episodes}{type}.pickle"
     self._path_tf_idf_matrix = f"data/pickle/tf-idf_matrix_min-df_{self._min_df}_max-df_{self._max_df}-{self.nb_episodes}{type}.pickle"
-    self._path_euclidian_distance_matrix = f"data/pickle/tf-idf_euclidian_distance_matrix_min-df_{self._min_df}_max-df_{self._max_df}-{self.nb_episodes}{type}.pickle"    
+    self._path_euclidean_distance_matrix = f"data/pickle/tf-idf_euclidean_distance_matrix_min-df_{self._min_df}_max-df_{self._max_df}-{self.nb_episodes}{type}.pickle"    
     self._path_cosine_distance_matrix = f"data/pickle/tf-idf_cosine_distance_matrix_min-df_{self._min_df}_max-df_{self._max_df}-{self.nb_episodes}{type}.pickle"    
     self._tf_idf_matrix = None
-    self._euclidian_distance_matrix = None
+    self._euclidean_distance_matrix = None
     self._cosine_distance_matrix = None
 
   def get_vectorizer(self):
     return self._vectorizer
+
+  def get_tf_idf_matrix(self):
+    return self._tf_idf_matrix
 
   def get_min_df(self):
     return self._min_df
@@ -55,17 +61,17 @@ class TfIdfVect():
     with open(self._path_tf_idf_matrix, 'wb') as file:
       pickle.dump(self._tf_idf_matrix, file)
 
-  def save_euclidian_distance_matrix_as_file(self):
+  def save_euclidean_distance_matrix_as_file(self):
     """
-    Save the euclidian distance matrix as file at self._path_euclidian_distance_matrix
+    Save the euclidean distance matrix as file at self._path_euclidean_distance_matrix
     """
 
-    if self._euclidian_distance_matrix is None:
-      raise Exception("Please, fill the euclidian distance matrix before trying to save it")
+    if self._euclidean_distance_matrix is None:
+      raise Exception("Please, fill the euclidean distance matrix before trying to save it")
       
-    os.makedirs(os.path.dirname(self._path_euclidian_distance_matrix), exist_ok=True)
-    with open(self._path_euclidian_distance_matrix, 'wb') as file:
-      pickle.dump(self._euclidian_distance_matrix, file)
+    os.makedirs(os.path.dirname(self._path_euclidean_distance_matrix), exist_ok=True)
+    with open(self._path_euclidean_distance_matrix, 'wb') as file:
+      pickle.dump(self._euclidean_distance_matrix, file)
 
   def save_cosine_distance_matrix_as_file(self):
     """
@@ -73,11 +79,11 @@ class TfIdfVect():
     """
 
     if self._cosine_distance_matrix is None:
-      raise Exception("Please, fill the euclidian distance matrix before trying to save it")
+      raise Exception("Please, fill the euclidean distance matrix before trying to save it")
       
     os.makedirs(os.path.dirname(self._path_cosine_distance_matrix), exist_ok=True)
     with open(self._path_cosine_distance_matrix, 'wb') as file:
-      pickle.dump(self._path_cosine_distance_matrix, file)
+      pickle.dump(self._cosine_distance_matrix, file)
     
 
   def _load_vectorizer_from_file(self):
@@ -86,6 +92,7 @@ class TfIdfVect():
     the function will return an error if the file doesn't exists
     """
     with open(self._path_vectorizer, 'rb') as file:
+      print(f"loading {self._path_vectorizer}")
       self._vectorizer = pickle.load(file)
 
   def _load_tf_idf_matrix_from_file(self):
@@ -94,22 +101,25 @@ class TfIdfVect():
     the function will return an error if the file doesn't exists
     """
     with open(self._path_tf_idf_matrix, 'rb') as file:
+      print(f"loading {self._path_tf_idf_matrix}")
       self._tf_idf_matrix = pickle.load(file)
 
-  def _load_euclidian_distance_matrix_from_file(self):
+  def _load_euclidean_distance_matrix_from_file(self):
     """
-    Loads the Euclidian Distance Matrix, from self._path_euclidian_distance_matrix
+    Loads the euclidean Distance Matrix, from self._path_euclidean_distance_matrix
     the function will return an error if the file doesn't exists
     """
-    with open(self._path_euclidian_distance_matrix, 'rb') as file:
-      self._euclidian_distance_matrix = pickle.load(file)
+    with open(self._path_euclidean_distance_matrix, 'rb') as file:
+      print(f"loading {self._path_euclidean_distance_matrix}")
+      self._euclidean_distance_matrix = pickle.load(file)
 
   def _load_cosine_distance_matrix_from_file(self):
     """
-    Loads the Cosine Distance Matrix, from self._path_euclidian_distance_matrix
+    Loads the Cosine Distance Matrix, from self._path_euclidean_distance_matrix
     the function will return an error if the file doesn't exists
     """
     with open(self._path_cosine_distance_matrix, 'rb') as file:
+      print(f"loading {self._path_cosine_distance_matrix}")
       self._cosine_distance_matrix = pickle.load(file)
 
   def fit_and_save_or_import(self, text):
@@ -127,25 +137,25 @@ class TfIdfVect():
       self.save_vectorizer_as_file()
       self.save_tf_idf_matrix_as_file()
 
-  def get_euclidian_distance_matrix(self):
+  def get_euclidean_distance_matrix(self):
     """
-    Returns the euclidian distance matrix. The function will load it from a file if possible
+    Returns the euclidean distance matrix. The function will load it from a file if possible
     """
 
-    if self._euclidian_distance_matrix is None:
+    if self._euclidean_distance_matrix is None:
       try:
-        self._load_euclidian_distance_matrix_from_file()
+        self._load_euclidean_distance_matrix_from_file()
       except:
         if self._tf_idf_matrix is None:
           raise Exception("Please fill the tf_idf_matrix, before. You can use `fit_and_save_or_import()`")
-        self._euclidian_distance_matrix = euclidean_distances(self._tf_idf_matrix, self._tf_idf_matrix)
-        self.save_euclidian_distance_matrix_as_file()
+        self._euclidean_distance_matrix = euclidean_distances(self._tf_idf_matrix, self._tf_idf_matrix)
+        self.save_euclidean_distance_matrix_as_file()
         
-    return self._euclidian_distance_matrix
+    return self._euclidean_distance_matrix
 
   def get_cosine_distance_matrix(self):
     """
-    Returns the euclidian distance matrix. The function will load it from a file if possible
+    Returns the euclidean distance matrix. The function will load it from a file if possible
     """
     
     if self._cosine_distance_matrix is None:
@@ -160,14 +170,33 @@ class TfIdfVect():
     return self._cosine_distance_matrix
 
 
-  def show_and_save_euclidian_distance_matrix(self, min_index_ep, max_index_ep):
-    plt.figure(figsize=(10, 10), dpi = 600) 
-    sns.heatmap(self.get_euclidian_distance_matrix()[min_index_ep:max_index_ep, min_index_ep:max_index_ep])
+  def show_and_save_euclidean_distance_matrix(self, min_index_ep, max_index_ep):
+    plt.figure(figsize=(6, 6), dpi = 300) 
+    sns.heatmap(self.get_euclidean_distance_matrix()[min_index_ep:max_index_ep, min_index_ep:max_index_ep])
     os.makedirs(os.path.dirname(root_path_image), exist_ok=True)
-    plt.savefig(root_path_image + f"matrix_tf-idf_euclidian_distance_min-df_{self._min_df}_max-df_{self._max_df}_min-index_{min_index_ep}_max-index_{max_index_ep}_type_{self._type}.png")
+    plt.savefig(root_path_image + f"matrix_tf-idf_euclidean_distance_min-df_{self._min_df}_max-df_{self._max_df}_min-index_{min_index_ep}_max-index_{max_index_ep}_type_{self._type}.png")
 
   def show_and_save_cosine_distance_matrix(self, min_index_ep, max_index_ep):
-    plt.figure(figsize=(10, 10), dpi = 600) 
+    plt.figure(figsize=(6, 6), dpi = 300) 
     sns.heatmap(self.get_cosine_distance_matrix()[min_index_ep:max_index_ep, min_index_ep:max_index_ep])
     os.makedirs(os.path.dirname(root_path_image), exist_ok=True)
     plt.savefig(root_path_image + f"matrix_tf-idf_cosine_distance_min-df_{self._min_df}_max-df_{self._max_df}_min-index_{min_index_ep}_max-index_{max_index_ep}_type_{self._type}.png")
+
+  def show_and_save_distance_matrices(self, min_index_ep, max_index_ep):
+    plt.figure(figsize=(12, 6), dpi=300)
+
+    # Matrice de distance euclidienne
+    plt.subplot(1, 2, 1)
+    euclidean_matrix = self.get_euclidean_distance_matrix()[min_index_ep:max_index_ep, min_index_ep:max_index_ep]
+    sns.heatmap(euclidean_matrix)
+    plt.title('Euclidean Distance Matrix')
+
+    # Matrice de distance cosinus
+    plt.subplot(1, 2, 2)
+    cosine_matrix = self.get_cosine_distance_matrix()[min_index_ep:max_index_ep, min_index_ep:max_index_ep]
+    sns.heatmap(cosine_matrix)
+    plt.title('Cosine Distance Matrix')
+
+    # Enregistrement de l'image
+    os.makedirs(os.path.dirname(root_path_image), exist_ok=True)
+    plt.savefig(root_path_image + f"distance_matrices_min-df_{self._min_df}_max-df_{self._max_df}_min-index_{min_index_ep}_max-index_{max_index_ep}_type_{self._type}.png")

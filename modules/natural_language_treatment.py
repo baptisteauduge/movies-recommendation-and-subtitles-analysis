@@ -13,7 +13,7 @@ nlp = spacy.load("en_core_web_sm", disable=['parser', 'ner', 'textcat', 'tokeniz
 
 def lemmatize_batch(batch):
    res = []
-   for doc in nlp.pipe(batch, batch_size=50, n_process=-1):
+   for doc in nlp.pipe(batch, batch_size=15, n_process=-1):
       res.append([word.lemma_.lower() for word in doc if word.lemma_ != ' ' and word.lemma_[0] != "'" and word.lemma_[0] != '-'])
    return res
 
@@ -38,6 +38,7 @@ def tokenize_and_lemmatize_df_path_episodes_and_save(df, batch_size=200):
          import_data.save_array_to_path(batch_lemmatized_transcripts[j - i],  df['path'][j].replace('data/transcripts/', 'data/lemmatized/'))
 
 # ########################################################
+
 
 
 def lower_case_tab(tab):
